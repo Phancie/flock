@@ -32,9 +32,7 @@ public class EmailActivity extends javax.swing.JFrame {
     public EmailActivity() {
         initComponents();
         setLocationRelativeTo(null);
-        File dir = new File("c:\\nameoffolder1");
-//        dir.mkdir();
-//        generateChart();
+        
     }
 
     /**
@@ -60,6 +58,8 @@ public class EmailActivity extends javax.swing.JFrame {
         activeMemItem = new javax.swing.JMenuItem();
         passiveMemItem = new javax.swing.JMenuItem();
         outreachMemItem = new javax.swing.JMenuItem();
+        cellMeetingItem = new javax.swing.JMenuItem();
+        sundayMeetingItem = new javax.swing.JMenuItem();
         newMemMenu = new javax.swing.JMenu();
         newMemItem = new javax.swing.JMenuItem();
         existMemItem = new javax.swing.JMenuItem();
@@ -124,13 +124,29 @@ public class EmailActivity extends javax.swing.JFrame {
         jMenu1.add(passiveMemItem);
 
         outreachMemItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.ALT_MASK));
-        outreachMemItem.setText("Outreach Member");
+        outreachMemItem.setText("Outreach List");
         outreachMemItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 outreachMemItemActionPerformed(evt);
             }
         });
         jMenu1.add(outreachMemItem);
+
+        cellMeetingItem.setText("Cell Meeting Attendace");
+        cellMeetingItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cellMeetingItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(cellMeetingItem);
+
+        sundayMeetingItem.setText("Sunday Meeting Attendace");
+        sundayMeetingItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sundayMeetingItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(sundayMeetingItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -383,6 +399,20 @@ public class EmailActivity extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_amgcMailItemActionPerformed
 
+    private void cellMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cellMeetingItemActionPerformed
+        // TODO add your handling code here:
+        CellDetailsActivity cda = new CellDetailsActivity();
+        cda.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_cellMeetingItemActionPerformed
+
+    private void sundayMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sundayMeetingItemActionPerformed
+        // TODO add your handling code here:
+        SundayAttendanceActivity saa = new SundayAttendanceActivity();
+        saa.setVisible(true);
+        saa.setVisible(false);
+    }//GEN-LAST:event_sundayMeetingItemActionPerformed
+
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
     Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
@@ -428,7 +458,7 @@ public class EmailActivity extends javax.swing.JFrame {
                     PlotOrientation.VERTICAL, true, true, false );
                     int width=1400; /* Width of the image */
                     int height=680; /* Height of the image */ 
-                    File BarChart=new File( "BarChartNew.jpeg" );
+                    File BarChart=new File( "c:\\Flock_Management_System\\AMGC.jpeg" );
                     ChartUtilities.saveChartAsJPEG( BarChart , barChart , width , height );
                     
                 }catch(Exception e){}       
@@ -475,6 +505,7 @@ public class EmailActivity extends javax.swing.JFrame {
     private javax.swing.JMenuItem allMemItem;
     private javax.swing.JMenuItem amgcMailItem;
     private javax.swing.JMenuItem cellDataItem;
+    private javax.swing.JMenuItem cellMeetingItem;
     private javax.swing.JTextField emailFld;
     private javax.swing.JLabel emailLbl;
     private javax.swing.JMenuItem existMemItem;
@@ -492,6 +523,7 @@ public class EmailActivity extends javax.swing.JFrame {
     private javax.swing.JMenu statMenu;
     private javax.swing.JMenuItem statMitem;
     private javax.swing.JMenuItem sunDataItem;
+    private javax.swing.JMenuItem sundayMeetingItem;
     private com.toedter.calendar.JYearChooser yearChooser;
     private javax.swing.JLabel yearLbl;
     // End of variables declaration//GEN-END:variables

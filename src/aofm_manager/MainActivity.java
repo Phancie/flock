@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,17 +26,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author REUBEN
  */
 public class MainActivity extends javax.swing.JFrame {
-    String imgPath = null;
+    String imgPath = new ImageIcon(AllMembersActivity.class.getResource("defaultImg.png")).toString();
     static String editMemberId = "";
-    URL urltemp;
+    
     /**
      * Creates new form MainActivity
      */
     public MainActivity() {
         initComponents();
         setLocationRelativeTo(MainActivity.this);
-//        System.err.println("Path "+imageLbl.getIcon());
-        urltemp = ClassLoader.getSystemResource("res/defaultImg.png");
+        imgPath = imgPath.replace("/", "\\");
+        System.err.println("DPath "+imgPath);
+       
 
         //UPDATING EXISTING DETAILS
         if(!AllMembersActivity.editMemberId.isEmpty()){
@@ -117,6 +117,8 @@ public class MainActivity extends javax.swing.JFrame {
         activeMemItem = new javax.swing.JMenuItem();
         passiveMemItem = new javax.swing.JMenuItem();
         outreachMemItem = new javax.swing.JMenuItem();
+        cellMeetingItem = new javax.swing.JMenuItem();
+        sundayMeetingItem = new javax.swing.JMenuItem();
         newMemMenu = new javax.swing.JMenu();
         newMemItem = new javax.swing.JMenuItem();
         existMemItem = new javax.swing.JMenuItem();
@@ -124,6 +126,8 @@ public class MainActivity extends javax.swing.JFrame {
         sunDataItem = new javax.swing.JMenuItem();
         statMenu = new javax.swing.JMenu();
         statMitem = new javax.swing.JMenuItem();
+        othersMenu = new javax.swing.JMenu();
+        amgcMailItem = new javax.swing.JMenuItem();
 
         jButton2.setText("jButton2");
 
@@ -219,13 +223,29 @@ public class MainActivity extends javax.swing.JFrame {
         jMenu1.add(passiveMemItem);
 
         outreachMemItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.ALT_MASK));
-        outreachMemItem.setText("Outreach Member");
+        outreachMemItem.setText("Outreach List");
         outreachMemItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 outreachMemItemActionPerformed(evt);
             }
         });
         jMenu1.add(outreachMemItem);
+
+        cellMeetingItem.setText("Cell Meeting Attendace");
+        cellMeetingItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cellMeetingItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(cellMeetingItem);
+
+        sundayMeetingItem.setText("Sunday Meeting Attendace");
+        sundayMeetingItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sundayMeetingItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(sundayMeetingItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -274,6 +294,18 @@ public class MainActivity extends javax.swing.JFrame {
         statMenu.add(statMitem);
 
         jMenuBar1.add(statMenu);
+
+        othersMenu.setText("Others");
+
+        amgcMailItem.setText("Email AMGC");
+        amgcMailItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                amgcMailItemActionPerformed(evt);
+            }
+        });
+        othersMenu.add(amgcMailItem);
+
+        jMenuBar1.add(othersMenu);
 
         setJMenuBar(jMenuBar1);
 
@@ -395,6 +427,7 @@ public class MainActivity extends javax.swing.JFrame {
              String path=file.getAbsolutePath();
              imageLbl.setIcon(ResizeImage(path));
              imgPath = path;
+             System.err.println("path "+path);
              if(!AllMembersActivity.editMemberId.isEmpty()){
                  try{
                         String userName  = "root";
@@ -436,8 +469,13 @@ public class MainActivity extends javax.swing.JFrame {
             Class.forName("com.mysql.jdbc.Driver");
             Connection con = (Connection) DriverManager.getConnection(url,userName,passWord);         
             if(AllMembersActivity.editMemberId.isEmpty()){
-                //if(imgPath.isEmpty() || imgPath ==null){imgPath = urltemp;}
-                InputStream is = new FileInputStream(new File(imgPath));
+                InputStream is = null;
+                if(imgPath.isEmpty() || imgPath ==null){
+                    is = MainActivity.class.getResourceAsStream("defaultImg.png");
+                }else{
+                    is = new FileInputStream(new File(imgPath));
+                }
+                //InputStream is = new FileInputStream(new File(imgPath));
                 PreparedStatement pstmt = con.prepareStatement("insert into register(fname,mname,lname,dob,phone,area,status,image) values(?,?,?,?,?,?,?,?)");
                 pstmt.setString(1, fnameFld.getText());
                 pstmt.setString(2, mNameFld.getText());
@@ -603,6 +641,27 @@ public class MainActivity extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_statMitemActionPerformed
 
+    private void cellMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cellMeetingItemActionPerformed
+        // TODO add your handling code here:
+        CellDetailsActivity cda = new CellDetailsActivity();
+        cda.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_cellMeetingItemActionPerformed
+
+    private void sundayMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sundayMeetingItemActionPerformed
+        // TODO add your handling code here:
+        SundayAttendanceActivity saa = new SundayAttendanceActivity();
+        saa.setVisible(true);
+        saa.setVisible(false);
+    }//GEN-LAST:event_sundayMeetingItemActionPerformed
+
+    private void amgcMailItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amgcMailItemActionPerformed
+        // TODO add your handling code here:
+        EmailActivity ea = new EmailActivity();
+        ea.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_amgcMailItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -641,10 +700,12 @@ public class MainActivity extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem activeMemItem;
     private javax.swing.JMenuItem allMemItem;
+    private javax.swing.JMenuItem amgcMailItem;
     private javax.swing.JTextField areaFld;
     private javax.swing.JLabel areaLbl;
     private javax.swing.JButton cancelBtn;
     private javax.swing.JMenuItem cellDataItem;
+    private javax.swing.JMenuItem cellMeetingItem;
     private com.toedter.calendar.JDateChooser dobChooser;
     private javax.swing.JLabel dobLbl;
     private javax.swing.JMenuItem existMemItem;
@@ -661,6 +722,7 @@ public class MainActivity extends javax.swing.JFrame {
     private javax.swing.JLabel mNameLbl;
     private javax.swing.JMenuItem newMemItem;
     private javax.swing.JMenu newMemMenu;
+    private javax.swing.JMenu othersMenu;
     private javax.swing.JMenuItem outreachMemItem;
     private javax.swing.JMenuItem passiveMemItem;
     private javax.swing.JTextField phoneFld;
@@ -671,6 +733,7 @@ public class MainActivity extends javax.swing.JFrame {
     private javax.swing.JComboBox statusCombo;
     private javax.swing.JLabel statusLbl;
     private javax.swing.JMenuItem sunDataItem;
+    private javax.swing.JMenuItem sundayMeetingItem;
     private javax.swing.JButton uploadBtn;
     // End of variables declaration//GEN-END:variables
     

@@ -49,6 +49,8 @@ public class CellMeetingActivity extends javax.swing.JFrame {
         activeMemItem = new javax.swing.JMenuItem();
         passiveMemItem = new javax.swing.JMenuItem();
         outreachMemItem = new javax.swing.JMenuItem();
+        cellMeetingItem = new javax.swing.JMenuItem();
+        sundayMeetingItem = new javax.swing.JMenuItem();
         newMemMenu = new javax.swing.JMenu();
         newMemItem = new javax.swing.JMenuItem();
         existMemItem = new javax.swing.JMenuItem();
@@ -56,6 +58,8 @@ public class CellMeetingActivity extends javax.swing.JFrame {
         sunDataItem = new javax.swing.JMenuItem();
         statMenu = new javax.swing.JMenu();
         statMitem = new javax.swing.JMenuItem();
+        othersMenu = new javax.swing.JMenu();
+        amgcMailItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -103,13 +107,29 @@ public class CellMeetingActivity extends javax.swing.JFrame {
         jMenu1.add(passiveMemItem);
 
         outreachMemItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.ALT_MASK));
-        outreachMemItem.setText("Outreach Member");
+        outreachMemItem.setText("Outreach List");
         outreachMemItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 outreachMemItemActionPerformed(evt);
             }
         });
         jMenu1.add(outreachMemItem);
+
+        cellMeetingItem.setText("Cell Meeting Attendace");
+        cellMeetingItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cellMeetingItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(cellMeetingItem);
+
+        sundayMeetingItem.setText("Sunday Meeting Attendace");
+        sundayMeetingItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sundayMeetingItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(sundayMeetingItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -158,6 +178,18 @@ public class CellMeetingActivity extends javax.swing.JFrame {
         statMenu.add(statMitem);
 
         jMenuBar1.add(statMenu);
+
+        othersMenu.setText("Others");
+
+        amgcMailItem.setText("Email AMGC");
+        amgcMailItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                amgcMailItemActionPerformed(evt);
+            }
+        });
+        othersMenu.add(amgcMailItem);
+
+        jMenuBar1.add(othersMenu);
 
         setJMenuBar(jMenuBar1);
 
@@ -365,6 +397,27 @@ public class CellMeetingActivity extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_statMitemActionPerformed
 
+    private void cellMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cellMeetingItemActionPerformed
+        // TODO add your handling code here:
+        CellDetailsActivity cda = new CellDetailsActivity();
+        cda.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_cellMeetingItemActionPerformed
+
+    private void sundayMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sundayMeetingItemActionPerformed
+        // TODO add your handling code here:
+        SundayAttendanceActivity saa = new SundayAttendanceActivity();
+        saa.setVisible(true);
+        saa.setVisible(false);
+    }//GEN-LAST:event_sundayMeetingItemActionPerformed
+
+    private void amgcMailItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amgcMailItemActionPerformed
+        // TODO add your handling code here:
+        EmailActivity ea = new EmailActivity();
+        ea.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_amgcMailItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -403,9 +456,11 @@ public class CellMeetingActivity extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem activeMemItem;
     private javax.swing.JMenuItem allMemItem;
+    private javax.swing.JMenuItem amgcMailItem;
     private javax.swing.JTextField attendField;
     private javax.swing.JLabel attendLbl;
     private javax.swing.JMenuItem cellDataItem;
+    private javax.swing.JMenuItem cellMeetingItem;
     private com.toedter.calendar.JDateChooser dateChooser;
     private javax.swing.JLabel dateLbl;
     private javax.swing.JMenuItem existMemItem;
@@ -415,11 +470,13 @@ public class CellMeetingActivity extends javax.swing.JFrame {
     private javax.swing.JMenu newMemMenu;
     private javax.swing.JTextField offeringField;
     private javax.swing.JLabel offeringLbl;
+    private javax.swing.JMenu othersMenu;
     private javax.swing.JMenuItem outreachMemItem;
     private javax.swing.JMenuItem passiveMemItem;
     private javax.swing.JMenu statMenu;
     private javax.swing.JMenuItem statMitem;
     private javax.swing.JButton submitBtn;
     private javax.swing.JMenuItem sunDataItem;
+    private javax.swing.JMenuItem sundayMeetingItem;
     // End of variables declaration//GEN-END:variables
 }

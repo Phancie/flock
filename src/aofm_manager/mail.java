@@ -25,7 +25,7 @@ public class mail
     public mail(String senderName, String to) {
         System.out.println("in mail handler");
         //Attachments array
-        String attachments[] = {"c:\\Flock\\BarChart.jpeg"}; 
+        String attachments[] = {"c:\\Flock_Management_System\\AMGC.jpeg"}; 
         
         // Recipient's email ID needs to be mentioned. 
         //String to = "busben97@gmail.com"; 
