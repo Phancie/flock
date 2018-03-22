@@ -5,6 +5,11 @@
  */
 package aofm_manager;
 
+import java.awt.Toolkit;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +29,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
 /**
@@ -31,12 +37,17 @@ import javax.swing.SwingWorker;
  * @author REUBEN
  */
 public class EmailMembersActivity extends javax.swing.JFrame {
-
+    JProgressBar pbar = new JProgressBar();
+    static String editMemberId = "";
+    String backupEmail;
+    boolean requestOnlineBackup  = false;
     /**
      * Creates new form emailMembersActivity
      */
     public EmailMembersActivity() {
         initComponents();
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("flock_icon.jpg")));
+        super.setTitle("Flock [Email Your Members List]");
         setLocationRelativeTo(null);
     }
 
@@ -55,8 +66,30 @@ public class EmailMembersActivity extends javax.swing.JFrame {
         nameLbl = new javax.swing.JLabel();
         nameFld = new javax.swing.JTextField();
         sendBtn = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        allMemItem = new javax.swing.JMenuItem();
+        activeMemItem = new javax.swing.JMenuItem();
+        passiveMemItem = new javax.swing.JMenuItem();
+        outreachMemItem = new javax.swing.JMenuItem();
+        cellMeetingItem = new javax.swing.JMenuItem();
+        sundayMeetingItem = new javax.swing.JMenuItem();
+        newMemMenu = new javax.swing.JMenu();
+        newMemItem = new javax.swing.JMenuItem();
+        existMemItem = new javax.swing.JMenuItem();
+        cellDataItem = new javax.swing.JMenuItem();
+        sunDataItem = new javax.swing.JMenuItem();
+        statMenu = new javax.swing.JMenu();
+        statMitem = new javax.swing.JMenuItem();
+        othersMenu = new javax.swing.JMenu();
+        amgcMailItem = new javax.swing.JMenuItem();
+        emailMembers = new javax.swing.JMenuItem();
+        backupMenu = new javax.swing.JMenu();
+        localBackupItem = new javax.swing.JMenuItem();
+        onlineBackupItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         headerLbl.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         headerLbl.setText("Email Your The List Of Your Cell Members");
@@ -71,6 +104,150 @@ public class EmailMembersActivity extends javax.swing.JFrame {
                 sendBtnActionPerformed(evt);
             }
         });
+
+        jMenu1.setText("File");
+
+        allMemItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.ALT_MASK));
+        allMemItem.setText(" All Members");
+        allMemItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                allMemItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(allMemItem);
+
+        activeMemItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.ALT_MASK));
+        activeMemItem.setText("Active Members");
+        activeMemItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeMemItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(activeMemItem);
+
+        passiveMemItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.ALT_MASK));
+        passiveMemItem.setText("Passive Members");
+        passiveMemItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passiveMemItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(passiveMemItem);
+
+        outreachMemItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.ALT_MASK));
+        outreachMemItem.setText("Outreach List");
+        outreachMemItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                outreachMemItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(outreachMemItem);
+
+        cellMeetingItem.setText("Cell Meeting Attendance");
+        cellMeetingItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cellMeetingItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(cellMeetingItem);
+
+        sundayMeetingItem.setText("Sunday Meeting Attendance");
+        sundayMeetingItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sundayMeetingItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(sundayMeetingItem);
+
+        jMenuBar1.add(jMenu1);
+
+        newMemMenu.setText("Edit");
+
+        newMemItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.ALT_MASK));
+        newMemItem.setText("Add New Member");
+        newMemItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newMemItemActionPerformed(evt);
+            }
+        });
+        newMemMenu.add(newMemItem);
+
+        existMemItem.setText("Update Member's Info");
+        existMemItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                existMemItemActionPerformed(evt);
+            }
+        });
+        newMemMenu.add(existMemItem);
+
+        cellDataItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.ALT_MASK));
+        cellDataItem.setText("Add Cell Meeting Data");
+        newMemMenu.add(cellDataItem);
+
+        sunDataItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.ALT_MASK));
+        sunDataItem.setText("Add Sunday Service Data");
+        sunDataItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sunDataItemActionPerformed(evt);
+            }
+        });
+        newMemMenu.add(sunDataItem);
+
+        jMenuBar1.add(newMemMenu);
+
+        statMenu.setText("Statistics");
+
+        statMitem.setText("Generate Annual Statistics");
+        statMitem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                statMitemActionPerformed(evt);
+            }
+        });
+        statMenu.add(statMitem);
+
+        jMenuBar1.add(statMenu);
+
+        othersMenu.setText("Others");
+
+        amgcMailItem.setText("Email AMGC");
+        amgcMailItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                amgcMailItemActionPerformed(evt);
+            }
+        });
+        othersMenu.add(amgcMailItem);
+
+        emailMembers.setText("Email Your Members List");
+        emailMembers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailMembersActionPerformed(evt);
+            }
+        });
+        othersMenu.add(emailMembers);
+
+        backupMenu.setText("Backup");
+
+        localBackupItem.setText("Local Backup");
+        localBackupItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                localBackupItemActionPerformed(evt);
+            }
+        });
+        backupMenu.add(localBackupItem);
+
+        onlineBackupItem.setText("Online Backup(Email)");
+        onlineBackupItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onlineBackupItemActionPerformed(evt);
+            }
+        });
+        backupMenu.add(onlineBackupItem);
+
+        othersMenu.add(backupMenu);
+
+        jMenuBar1.add(othersMenu);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -88,7 +265,6 @@ public class EmailMembersActivity extends javax.swing.JFrame {
                             .addComponent(recLbl, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 0, 0)
                                 .addComponent(sendBtn)
                                 .addContainerGap(194, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -111,7 +287,7 @@ public class EmailMembersActivity extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(recField, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(recLbl))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 58, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
                 .addComponent(sendBtn)
                 .addGap(34, 34, 34))
         );
@@ -129,8 +305,178 @@ public class EmailMembersActivity extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Enter a valid email", "Email Message", 0);
             return;
         }
-        new EmailMembersWorker().execute();
+        
+        new MainWorker().execute();
     }//GEN-LAST:event_sendBtnActionPerformed
+
+    private void allMemItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allMemItemActionPerformed
+        // TODO add your handling code here:
+        AllMembersActivity ama = new AllMembersActivity();
+        ama.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_allMemItemActionPerformed
+
+    private void activeMemItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_activeMemItemActionPerformed
+        // TODO add your handling code here:
+        ActiveMembersActivity acma = new ActiveMembersActivity();
+        acma.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_activeMemItemActionPerformed
+
+    private void passiveMemItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passiveMemItemActionPerformed
+        // TODO add your handling code here:
+        PassiveMembersActivity pma = new PassiveMembersActivity();
+        pma.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_passiveMemItemActionPerformed
+
+    private void outreachMemItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_outreachMemItemActionPerformed
+        // TODO add your handling code here:
+        OutreachMembersActivity oma = new OutreachMembersActivity();
+        oma.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_outreachMemItemActionPerformed
+
+    private void cellMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cellMeetingItemActionPerformed
+        // TODO add your handling code here:
+        CellDetailsActivity cda = new CellDetailsActivity();
+        cda.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_cellMeetingItemActionPerformed
+
+    private void sundayMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sundayMeetingItemActionPerformed
+        // TODO add your handling code here:
+        SundayDetailsActivity sda = new SundayDetailsActivity();
+        sda.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_sundayMeetingItemActionPerformed
+
+    private void newMemItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newMemItemActionPerformed
+        // TODO add your handling code here:
+        AllMembersActivity.editMemberId = "";
+        MainActivity ma = new MainActivity();
+        ma.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_newMemItemActionPerformed
+
+    private void existMemItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existMemItemActionPerformed
+        // TODO add your handling code here:
+
+        int flag = 1;
+        while(flag ==1){
+
+            JTextField idField = new JTextField();
+            Object [] obj = {"Enter Member's ID:\n\n",idField};
+            Object stringArray[]={"OK","Cancel"};
+            int dialog = JOptionPane.showOptionDialog(null, obj, "Enter Member's ID", JOptionPane.YES_NO_OPTION,3, null, stringArray, obj);
+            if(dialog==JOptionPane.YES_OPTION){
+                //FLAG IS SET TO 0 HERE SO THAT IT DOESN'T RE RUN EVEN WHEN CONDITION IS FALSE
+                flag = 0;
+                editMemberId = idField.getText();
+                if(editMemberId.length()!=0)
+                {
+                    try{
+                        String userName  = "root";
+                        String passWord = "";
+                        String url = "jdbc:mysql://localhost:3306/aofm_db";
+                        Class.forName("com.mysql.jdbc.Driver");
+                        Connection con = (Connection) DriverManager.getConnection(url,userName,passWord);
+                        String query = "select * from register where id ="+editMemberId;
+                        System.err.println(query);
+                        PreparedStatement pstmt = con.prepareStatement(query);
+                        ResultSet rset = pstmt.executeQuery();
+                        String id="";
+                        String fname = "";
+                        while(rset.next()){
+                            id = rset.getString("id");
+                            fname = rset.getString(2);
+                        }
+                        if(!id.isEmpty()){
+                            flag = 0;
+                            AllMembersActivity.editMemberId = editMemberId ;
+                            MainActivity ma = new MainActivity();
+                            ma.setVisible(true);
+                            this.setVisible(false);
+
+                        }else{
+                            JOptionPane.showMessageDialog(null, "ID is invalid. Please enter a valid ID","ID Error",0);
+                            flag = 1;
+                        }
+
+                    }catch(Exception e){}
+
+                }
+                else if(editMemberId.length()==0){
+                    JOptionPane.showMessageDialog(null, "No ID Entered", "Member ID", 0);
+                    flag = 1;
+                }
+            }else{
+                flag = 0;
+            }
+
+        }
+    }//GEN-LAST:event_existMemItemActionPerformed
+
+    private void sunDataItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sunDataItemActionPerformed
+        // TODO add your handling code here:
+        SundayAttendanceActivity saa = new SundayAttendanceActivity();
+        saa.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_sunDataItemActionPerformed
+
+    private void statMitemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statMitemActionPerformed
+        // TODO add your handling code here:
+        StatDataActivity sda = new StatDataActivity();
+        sda.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_statMitemActionPerformed
+
+    private void amgcMailItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amgcMailItemActionPerformed
+        // TODO add your handling code here:
+        EmailActivity ea = new EmailActivity();
+        ea.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_amgcMailItemActionPerformed
+
+    private void emailMembersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailMembersActionPerformed
+        // TODO add your handling code here:
+        EmailMembersActivity ema = new EmailMembersActivity();
+        ema.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_emailMembersActionPerformed
+
+    private void localBackupItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localBackupItemActionPerformed
+        //backupDb();
+        new MainWorker().execute();
+    }//GEN-LAST:event_localBackupItemActionPerformed
+
+    private void onlineBackupItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onlineBackupItemActionPerformed
+        // TODO add your handling code here:
+        int flag = 1;
+        while(flag==1){
+            JTextField emailField = new JTextField();
+            Object [] obj = {"Enter Your Email:\n\n",emailField};
+            Object stringArray[]={"OK","Cancel"};
+            int dialog = JOptionPane.showOptionDialog(null, obj, "Enter Member's ID", JOptionPane.YES_NO_OPTION,3, null, stringArray, obj);
+            if(dialog==JOptionPane.YES_OPTION){
+                //FLAG IS SET TO 0 HERE SO THAT IT DOESN'T RE RUN EVEN WHEN CONDITION IS FALSE
+                flag = 0;
+                backupEmail = emailField.getText();
+                if(!backupEmail.isEmpty()){
+                    if(validate(backupEmail)){
+                        requestOnlineBackup = true;
+                        new MainWorker().execute();
+
+                    }else{
+                        JOptionPane.showMessageDialog(null,"Enter a valid email", "Online Backup Message", 0);
+                        flag = 1;
+                    }
+                }
+            }else{
+                flag = 0;
+            }
+        }
+    }//GEN-LAST:event_onlineBackupItemActionPerformed
 
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
     Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
@@ -141,14 +487,14 @@ public class EmailMembersActivity extends javax.swing.JFrame {
     }
     
     
-    class EmailMembersWorker extends SwingWorker<Integer, Integer>{
-        JProgressBar pbar;
+    class MainWorker extends SwingWorker<Integer, Integer>{
+        
         @Override
         protected Integer doInBackground() throws Exception
         {
-            writeDbToFile wd = new writeDbToFile();
-            pbar = new JProgressBar();
+            pbar.setStringPainted(true);
             pbar.setIndeterminate(true);
+            writeDbToFile wd = new writeDbToFile();
             String attachments[] = {"c:\\Flock_Management_System\\identities.txt"}; 
         
             // Recipient's email ID needs to be mentioned. 
@@ -200,6 +546,7 @@ public class EmailMembersActivity extends javax.swing.JFrame {
             // Part two is attachment 
             for(int i = 0; i < attachments.length; i++)
             {
+                
                 messageBodyPart = new MimeBodyPart(); 
                 String filename = attachments[i]; 
                 DataSource source = new FileDataSource(filename); 
@@ -268,11 +615,32 @@ public class EmailMembersActivity extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem activeMemItem;
+    private javax.swing.JMenuItem allMemItem;
+    private javax.swing.JMenuItem amgcMailItem;
+    private javax.swing.JMenu backupMenu;
+    private javax.swing.JMenuItem cellDataItem;
+    private javax.swing.JMenuItem cellMeetingItem;
+    private javax.swing.JMenuItem emailMembers;
+    private javax.swing.JMenuItem existMemItem;
     private javax.swing.JLabel headerLbl;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem localBackupItem;
     private javax.swing.JTextField nameFld;
     private javax.swing.JLabel nameLbl;
+    private javax.swing.JMenuItem newMemItem;
+    private javax.swing.JMenu newMemMenu;
+    private javax.swing.JMenuItem onlineBackupItem;
+    private javax.swing.JMenu othersMenu;
+    private javax.swing.JMenuItem outreachMemItem;
+    private javax.swing.JMenuItem passiveMemItem;
     private javax.swing.JTextField recField;
     private javax.swing.JLabel recLbl;
     private javax.swing.JButton sendBtn;
+    private javax.swing.JMenu statMenu;
+    private javax.swing.JMenuItem statMitem;
+    private javax.swing.JMenuItem sunDataItem;
+    private javax.swing.JMenuItem sundayMeetingItem;
     // End of variables declaration//GEN-END:variables
 }

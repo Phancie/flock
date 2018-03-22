@@ -55,7 +55,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="cellMeetingItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Cell Meeting Attendace"/>
+                <Property name="text" type="java.lang.String" value="Cell Meeting Attendance"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cellMeetingItemActionPerformed"/>
@@ -63,7 +63,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="sundayMeetingItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Sunday Meeting Attendace"/>
+                <Property name="text" type="java.lang.String" value="Sunday Meeting Attendance"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sundayMeetingItemActionPerformed"/>

@@ -5,63 +5,50 @@
  */
 package aofm_manager;
 
-import java.io.File;
-import java.io.IOException;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.ui.RefineryUtilities;
+import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
 /**
  *
  * @author REUBEN
  */
 public class AOFM_Manager {
-
+    boolean requestOnlineBackup = false;
     /**
-     * @param args the command line arguments
      */
 
 
+    public static void backupDb(){
+ 
+        try{
+            ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", "C:\\wamp\\bin\\mysql\\mysql5.5.24\\bin\\mysqldump -e -u root -h localhost aofm_db > c:\\Flock_Management_System\\backup.sql"); //1 & 3
+
+            Process exec = builder.start();
+            int retCode = exec.waitFor();
+            if (retCode != 0) { //4
+                // something went wrong
+                InputStream errorStream = exec.getErrorStream();
+                byte[] buffer = new byte[errorStream.available()];
+                errorStream.read(buffer);
+
+                System.out.println(new String(buffer));
+                
+                JOptionPane.showMessageDialog(null, "Backup was not able to complete. Contact developer if problem persits", "Backup Message", 0);
+            }
+            else{
+                //JOptionPane.showMessageDialog(null, "Backup Successful", "Backup Message", 1);
+            }
+        }catch(Exception e){
+            System.err.println(e);
+        }
+        
+
+    }  
     
     
-    public static void main(String[] args) throws IOException {
-        // TODO code application logic here
-        final String fiat = "FIAT";
-        final String audi = "AUDI";
-        final String ford = "FORD";
-        final String speed = "Speed"; 
-        final String millage = "Millage";
-        final String userrating = "User Rating";
-        final String safety = "safety";
-        final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        
-        dataset.addValue( 1.0 , fiat , speed ); 
-        dataset.addValue( 3.0 , fiat , userrating ); 
-        dataset.addValue( 5.0 , fiat , millage );
-        dataset.addValue( 5.0 , fiat , safety );
-        dataset.addValue( 5.0 , audi , speed );
-        
-        dataset.addValue( 5.0 , audi , speed );
-        dataset.addValue( 6.0 , audi , userrating ); 
-        dataset.addValue( 10.0 , audi , millage );
-        dataset.addValue( 4.0 , audi , safety );
-        
-        dataset.addValue( 4.0 , ford , speed ); 
-        dataset.addValue( 2.0 , ford , userrating );
-        dataset.addValue( 3.0 , ford , millage ); 
-        dataset.addValue( 6.0 , ford , safety );
-        
-        JFreeChart barChart = ChartFactory.createBarChart( "CAR USAGE STATISTICS", "Category", "Score", dataset,PlotOrientation.VERTICAL, true, true, false ); 
-        int width=640; /* Width of the image */ 
-        int height=480; /* Height of the image */
-        File BarChart=new File( "BarChart.jpeg" ); 
-        ChartUtilities.saveChartAsJPEG(BarChart , barChart , width , height );
-        
-    }
     
-   
     
 }

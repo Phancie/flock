@@ -7,18 +7,24 @@ package aofm_manager;
 
 import com.mysql.jdbc.Connection;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -26,21 +32,39 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author REUBEN
  */
 public class MainActivity extends javax.swing.JFrame {
-    String imgPath = new ImageIcon(AllMembersActivity.class.getResource("defaultImg.png")).toString();
+    String imgPath = null;
     static String editMemberId = "";
+    String backupEmail;
+    boolean requestOnlineBackup  = false;
     
     /**
      * Creates new form MainActivity
      */
     public MainActivity() {
         initComponents();
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("flock_icon.jpg")));
+        super.setTitle("Flock [Add New Member]");
         setLocationRelativeTo(MainActivity.this);
-        imgPath = imgPath.replace("/", "\\");
+        //imgPath = imgPath.replace("/", "\\");
         System.err.println("DPath "+imgPath);
-       
-
+        
+        //SETTING PACKETS
+        try{
+                String userName  = "root";
+                String passWord = "";
+                String url = "jdbc:mysql://localhost:3306/aofm_db";
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection con = (Connection) DriverManager.getConnection(url,userName,passWord);
+                String query = "set global max_allowed_packet = 33554432";
+                PreparedStatement pstmt = con.prepareStatement(query);
+                pstmt.executeUpdate();
+        }catch(Exception e){
+            
+        }
+        
         //UPDATING EXISTING DETAILS
         if(!AllMembersActivity.editMemberId.isEmpty()){
+            super.setTitle("Flock [Update Member's Details]");
             registerBtn.setText("Update");
             uploadBtn.setText("Change Image");
             headerLbl.setText("Update Member's Details");
@@ -53,7 +77,6 @@ public class MainActivity extends javax.swing.JFrame {
                 String query = "select * from register where id="+AllMembersActivity.editMemberId;
                 PreparedStatement pstmt = con.prepareStatement(query);
                 ResultSet rset = pstmt.executeQuery();
-                
                 while(rset.next()){
                     
                     String fname = rset.getString("fname");
@@ -128,6 +151,12 @@ public class MainActivity extends javax.swing.JFrame {
         statMitem = new javax.swing.JMenuItem();
         othersMenu = new javax.swing.JMenu();
         amgcMailItem = new javax.swing.JMenuItem();
+        othersMenu1 = new javax.swing.JMenu();
+        amgcMailItem1 = new javax.swing.JMenuItem();
+        emailMembers = new javax.swing.JMenuItem();
+        backupMenu = new javax.swing.JMenu();
+        localBackupItem = new javax.swing.JMenuItem();
+        onlineBackupItem = new javax.swing.JMenuItem();
 
         jButton2.setText("jButton2");
 
@@ -231,7 +260,7 @@ public class MainActivity extends javax.swing.JFrame {
         });
         jMenu1.add(outreachMemItem);
 
-        cellMeetingItem.setText("Cell Meeting Attendace");
+        cellMeetingItem.setText("Cell Meeting Attendance");
         cellMeetingItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cellMeetingItemActionPerformed(evt);
@@ -306,6 +335,46 @@ public class MainActivity extends javax.swing.JFrame {
         othersMenu.add(amgcMailItem);
 
         jMenuBar1.add(othersMenu);
+
+        othersMenu1.setText("Others");
+
+        amgcMailItem1.setText("Email AMGC");
+        amgcMailItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                amgcMailItem1ActionPerformed(evt);
+            }
+        });
+        othersMenu1.add(amgcMailItem1);
+
+        emailMembers.setText("Email Your Members List");
+        emailMembers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailMembersActionPerformed(evt);
+            }
+        });
+        othersMenu1.add(emailMembers);
+
+        backupMenu.setText("Backup");
+
+        localBackupItem.setText("Local Backup");
+        localBackupItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                localBackupItemActionPerformed(evt);
+            }
+        });
+        backupMenu.add(localBackupItem);
+
+        onlineBackupItem.setText("Online Backup(Email)");
+        onlineBackupItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onlineBackupItemActionPerformed(evt);
+            }
+        });
+        backupMenu.add(onlineBackupItem);
+
+        othersMenu1.add(backupMenu);
+
+        jMenuBar1.add(othersMenu1);
 
         setJMenuBar(jMenuBar1);
 
@@ -461,7 +530,13 @@ public class MainActivity extends javax.swing.JFrame {
             }
             return;
         }
+       // boolean isNumeric = phoneFld.getText().chars().allMatch( Character::isDigit );
         
+        if((phoneFld.getText().length()!=10 && phoneFld.getText().length()!=13)
+                || (!phoneFld.getText().startsWith("0")&& !phoneFld.getText().startsWith("+233"))){
+                JOptionPane.showMessageDialog(null, "Please enter a valid phone number", "Registration Message", 0);
+                return;
+        }
         try{
             String userName  = "root";
             String passWord = "";
@@ -469,13 +544,10 @@ public class MainActivity extends javax.swing.JFrame {
             Class.forName("com.mysql.jdbc.Driver");
             Connection con = (Connection) DriverManager.getConnection(url,userName,passWord);         
             if(AllMembersActivity.editMemberId.isEmpty()){
-                InputStream is = null;
-                if(imgPath.isEmpty() || imgPath ==null){
-                    is = MainActivity.class.getResourceAsStream("defaultImg.png");
-                }else{
-                    is = new FileInputStream(new File(imgPath));
+                InputStream is = MainActivity.class.getResourceAsStream("defaultImg.png");
+                if(imgPath !=null && !imgPath.isEmpty()){
+                    is = Files.newInputStream(Paths.get(imgPath));
                 }
-                //InputStream is = new FileInputStream(new File(imgPath));
                 PreparedStatement pstmt = con.prepareStatement("insert into register(fname,mname,lname,dob,phone,area,status,image) values(?,?,?,?,?,?,?,?)");
                 pstmt.setString(1, fnameFld.getText());
                 pstmt.setString(2, mNameFld.getText());
@@ -509,11 +581,12 @@ public class MainActivity extends javax.swing.JFrame {
                     pstmt.setString(7, (String) statusCombo.getSelectedItem());
                     pstmt.setInt(8, Integer.parseInt(AllMembersActivity.editMemberId));
                     pstmt.executeUpdate();
+                    AllMembersActivity.editMemberId = "";
                     JOptionPane.showMessageDialog(null, "Member successfully updated", "Update Message", 1);
             }
             
           }catch(Exception e){
-                System.err.println(e);
+                e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Registration Error. Make sure to upload an image. Contact developer if problem persists afterwards "+e, "Registration Message", 0);
           }
            
@@ -565,8 +638,10 @@ public class MainActivity extends javax.swing.JFrame {
 
     private void newMemItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newMemItemActionPerformed
         // TODO add your handling code here:
+        AllMembersActivity.editMemberId = "";
         MainActivity ma = new MainActivity();
         ma.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_newMemItemActionPerformed
 
     private void existMemItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existMemItemActionPerformed
@@ -650,9 +725,9 @@ public class MainActivity extends javax.swing.JFrame {
 
     private void sundayMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sundayMeetingItemActionPerformed
         // TODO add your handling code here:
-        SundayAttendanceActivity saa = new SundayAttendanceActivity();
-        saa.setVisible(true);
-        saa.setVisible(false);
+        SundayDetailsActivity sda = new SundayDetailsActivity();
+        sda.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_sundayMeetingItemActionPerformed
 
     private void amgcMailItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amgcMailItemActionPerformed
@@ -662,6 +737,88 @@ public class MainActivity extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_amgcMailItemActionPerformed
 
+    private void amgcMailItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amgcMailItem1ActionPerformed
+        // TODO add your handling code here:
+        EmailActivity ea = new EmailActivity();
+        ea.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_amgcMailItem1ActionPerformed
+
+    private void emailMembersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailMembersActionPerformed
+        // TODO add your handling code here:
+        EmailMembersActivity ema = new EmailMembersActivity();
+        ema.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_emailMembersActionPerformed
+
+    private void localBackupItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localBackupItemActionPerformed
+        //backupDb();
+        new MainWorker().execute();
+    }//GEN-LAST:event_localBackupItemActionPerformed
+
+    private void onlineBackupItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onlineBackupItemActionPerformed
+        // TODO add your handling code here:
+        int flag = 1;
+        while(flag==1){
+            JTextField emailField = new JTextField();
+            Object [] obj = {"Enter Your Email:\n\n",emailField};
+            Object stringArray[]={"OK","Cancel"};
+            int dialog = JOptionPane.showOptionDialog(null, obj, "Enter Member's ID", JOptionPane.YES_NO_OPTION,3, null, stringArray, obj);
+            if(dialog==JOptionPane.YES_OPTION){
+                //FLAG IS SET TO 0 HERE SO THAT IT DOESN'T RE RUN EVEN WHEN CONDITION IS FALSE
+                flag = 0;
+                backupEmail = emailField.getText();
+                if(!backupEmail.isEmpty()){
+                    if(validate(backupEmail)){
+                        requestOnlineBackup = true;
+                        new MainWorker().execute();
+
+                    }else{
+                        JOptionPane.showMessageDialog(null,"Enter a valid email", "Online Backup Message", 0);
+                        flag = 1;
+                    }
+                }
+            }else{
+                flag = 0;
+            }
+        }
+
+    }//GEN-LAST:event_onlineBackupItemActionPerformed
+
+    public static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
+    Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+    public static boolean validate(String emailStr) {
+            Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
+            return matcher.find();
+    }
+    
+    class MainWorker extends SwingWorker<Integer, Integer>{
+        
+        @Override
+        protected Integer doInBackground() throws Exception
+        {
+            
+            AOFM_Manager.backupDb();
+            if(requestOnlineBackup == true){
+                mailBackupFile mbf = new mailBackupFile(backupEmail);
+            }
+            
+            return 42;
+        }
+
+        @Override
+        protected void done()
+        {
+            try
+            {
+                JOptionPane.showMessageDialog(null, "Backup Successful", "Backup Message", 1); 
+            }
+            catch (Exception e)
+            {
+            }
+        }
+    }
     /**
      * @param args the command line arguments
      */
@@ -701,13 +858,16 @@ public class MainActivity extends javax.swing.JFrame {
     private javax.swing.JMenuItem activeMemItem;
     private javax.swing.JMenuItem allMemItem;
     private javax.swing.JMenuItem amgcMailItem;
+    private javax.swing.JMenuItem amgcMailItem1;
     private javax.swing.JTextField areaFld;
     private javax.swing.JLabel areaLbl;
+    private javax.swing.JMenu backupMenu;
     private javax.swing.JButton cancelBtn;
     private javax.swing.JMenuItem cellDataItem;
     private javax.swing.JMenuItem cellMeetingItem;
     private com.toedter.calendar.JDateChooser dobChooser;
     private javax.swing.JLabel dobLbl;
+    private javax.swing.JMenuItem emailMembers;
     private javax.swing.JMenuItem existMemItem;
     private javax.swing.JTextField fnameFld;
     private javax.swing.JLabel fnameLbl;
@@ -718,11 +878,14 @@ public class MainActivity extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JTextField lNameFld;
     private javax.swing.JLabel lNameLbl;
+    private javax.swing.JMenuItem localBackupItem;
     private javax.swing.JTextField mNameFld;
     private javax.swing.JLabel mNameLbl;
     private javax.swing.JMenuItem newMemItem;
     private javax.swing.JMenu newMemMenu;
+    private javax.swing.JMenuItem onlineBackupItem;
     private javax.swing.JMenu othersMenu;
+    private javax.swing.JMenu othersMenu1;
     private javax.swing.JMenuItem outreachMemItem;
     private javax.swing.JMenuItem passiveMemItem;
     private javax.swing.JTextField phoneFld;

@@ -55,7 +55,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="cellMeetingItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Cell Meeting Attendace"/>
+                <Property name="text" type="java.lang.String" value="Cell Meeting Attendance"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cellMeetingItemActionPerformed"/>
@@ -63,7 +63,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="sundayMeetingItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Sunday Meeting Attendace"/>
+                <Property name="text" type="java.lang.String" value="Sunday Meeting Attendance"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sundayMeetingItemActionPerformed"/>
@@ -144,6 +144,37 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="amgcMailItemActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="emailMembers">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Email Your Members List"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="emailMembersActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <Menu class="javax.swing.JMenu" name="backupMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Backup"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="localBackupItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Local Backup"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="localBackupItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="onlineBackupItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Online Backup(Email)"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="onlineBackupItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
           </SubComponents>
         </Menu>
       </SubComponents>

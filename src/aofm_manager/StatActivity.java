@@ -5,6 +5,7 @@
  */
 package aofm_manager;
 
+import java.awt.Toolkit;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -30,7 +31,7 @@ public class StatActivity extends javax.swing.JFrame {
      */
     public StatActivity() {
         initComponents();
-        
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("flock_icon.jpg")));
     }
 
     public StatActivity(String applicationTitle, String chartTitle) {
@@ -46,6 +47,7 @@ public class StatActivity extends javax.swing.JFrame {
         chartPanel.setPreferredSize(new java.awt.Dimension( 560 , 367 ) );
         setContentPane( chartPanel );
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
     
      private CategoryDataset createDataset(){

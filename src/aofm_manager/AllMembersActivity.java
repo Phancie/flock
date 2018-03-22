@@ -6,6 +6,7 @@
 package aofm_manager;
 
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -33,13 +34,14 @@ public class AllMembersActivity extends javax.swing.JFrame implements TableModel
     static String editMemberId = ""; 
     boolean requestOnlineBackup  = false;
     String backupEmail = "";  
-    
+    JProgressBar progressBar;
     /**
      * Creates new form QueryActivity
      */
     public AllMembersActivity() {
         initComponents();
-        super.setTitle("AOFM MANAGER[All Members]");
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("flock_icon.jpg")));
+        super.setTitle("Flock [All Members]");
         super.setExtendedState(MAXIMIZED_BOTH);
         allDetailsQuery();
         allMembersTable.getModel().addTableModelListener(AllMembersActivity.this);
@@ -272,7 +274,7 @@ public class AllMembersActivity extends javax.swing.JFrame implements TableModel
         });
         jMenu1.add(outreachMemItem);
 
-        cellMeetingItem.setText("Cell Meeting Attendace");
+        cellMeetingItem.setText("Cell Meeting Attendance");
         cellMeetingItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cellMeetingItemActionPerformed(evt);
@@ -280,7 +282,7 @@ public class AllMembersActivity extends javax.swing.JFrame implements TableModel
         });
         jMenu1.add(cellMeetingItem);
 
-        sundayMeetingItem.setText("Sunday Meeting Attendace");
+        sundayMeetingItem.setText("Sunday Meeting Attendance");
         sundayMeetingItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 sundayMeetingItemActionPerformed(evt);
@@ -423,8 +425,10 @@ public class AllMembersActivity extends javax.swing.JFrame implements TableModel
 
     private void newMemItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newMemItemActionPerformed
         // TODO add your handling code here:
+        AllMembersActivity.editMemberId = "";
         MainActivity ma = new MainActivity();
         ma.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_newMemItemActionPerformed
 
     private void allMembersTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_allMembersTableMouseClicked
@@ -632,9 +636,9 @@ public class AllMembersActivity extends javax.swing.JFrame implements TableModel
 
     private void sundayMeetingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sundayMeetingItemActionPerformed
         // TODO add your handling code here:
-            SundayAttendanceActivity saa = new SundayAttendanceActivity();
-            saa.setVisible(true);
-            saa.setVisible(false);
+            SundayDetailsActivity sda = new SundayDetailsActivity();
+            sda.setVisible(true);
+            this.setVisible(false);
     }//GEN-LAST:event_sundayMeetingItemActionPerformed
 
     private void amgcMailItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amgcMailItemActionPerformed
@@ -646,7 +650,7 @@ public class AllMembersActivity extends javax.swing.JFrame implements TableModel
 
     private void localBackupItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localBackupItemActionPerformed
         //backupDb();
-        new AllMembersWorker().execute();
+        new MainWorker().execute();
     }//GEN-LAST:event_localBackupItemActionPerformed
 
     private void onlineBackupItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onlineBackupItemActionPerformed
@@ -664,7 +668,7 @@ public class AllMembersActivity extends javax.swing.JFrame implements TableModel
                 if(!backupEmail.isEmpty()){
                     if(validate(backupEmail)){
                             requestOnlineBackup = true;
-                            new AllMembersWorker().execute();
+                            new MainWorker().execute();
                             
                     }else{
                         JOptionPane.showMessageDialog(null,"Enter a valid email", "Online Backup Message", 0);
@@ -678,11 +682,6 @@ public class AllMembersActivity extends javax.swing.JFrame implements TableModel
         
     }//GEN-LAST:event_onlineBackupItemActionPerformed
 
-    private void emailMembersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailMembersActionPerformed
-        // TODO add your handling code here:
-        
-    }//GEN-LAST:event_emailMembersActionPerformed
-
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
     Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
@@ -690,40 +689,25 @@ public class AllMembersActivity extends javax.swing.JFrame implements TableModel
             Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
             return matcher.find();
     }
-  
-    public static void backupDb(){
- 
-        try{
-            ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", "C:\\wamp\\bin\\mysql\\mysql5.5.24\\bin\\mysqldump -e -u root -h localhost aofm_db > c:\\Flock_Management_System\\backup.sql"); //1 & 3
-
-            Process exec = builder.start();
-            int retCode = exec.waitFor();
-            if (retCode != 0) { //4
-                // something went wrong
-                InputStream errorStream = exec.getErrorStream();
-                byte[] buffer = new byte[errorStream.available()];
-                errorStream.read(buffer);
-
-                System.out.println(new String(buffer));
-                
-                JOptionPane.showMessageDialog(null, "Backup was not able to complete. Contact developer if problem persits", "Backup Message", 0);
-            }
-            else{
-                //JOptionPane.showMessageDialog(null, "Backup Successful", "Backup Message", 1);
-            }
-        }catch(Exception e){
-            System.err.println(e);
-        }
-        
-
-}
     
-    class AllMembersWorker extends SwingWorker<Integer, Integer>{
+    private void emailMembersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailMembersActionPerformed
+        // TODO add your handling code here:
+            EmailMembersActivity ema = new EmailMembersActivity();
+            ema.setVisible(true);
+            this.setVisible(false);
+    }//GEN-LAST:event_emailMembersActionPerformed
+
+    
+  
+    
+    class MainWorker extends SwingWorker<Integer, Integer>{
         
         @Override
         protected Integer doInBackground() throws Exception
         {
-            backupDb();
+            progressBar.setStringPainted(true);
+            progressBar.setIndeterminate(true);
+            AOFM_Manager.backupDb();
             if(requestOnlineBackup == true){
                 mailBackupFile mbf = new mailBackupFile(backupEmail);
             }
